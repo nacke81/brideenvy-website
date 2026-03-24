@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<ruleset name="BrideEnvy">
+	<description>WordPress Coding Standards for BrideEnvy.com</description>
+
+	<file>./wp-content/themes/</file>
+	<file>./wp-content/plugins/</file>
+	<file>./wp-content/mu-plugins/</file>
+
+	<exclude-pattern>/vendor/*</exclude-pattern>
+	<exclude-pattern>/node_modules/*</exclude-pattern>
+	<exclude-pattern>/wp-content/plugins/woocommerce*/*</exclude-pattern>
+	<exclude-pattern>/wp-content/plugins/advanced-custom-fields*/*</exclude-pattern>
+	<exclude-pattern>/wp-content/plugins/wordpress-seo/*</exclude-pattern>
+
+	<arg name="extensions" value="php"/>
+	<arg value="sp"/>
+
+	<rule ref="WordPress">
+		<exclude name="WordPress.Files.FileName.InvalidClassFileName"/>
+	</rule>
+
+	<config name="minimum_wp_version" value="6.0"/>
+	<config name="text_domain" value="brideenvy"/>
+</ruleset>

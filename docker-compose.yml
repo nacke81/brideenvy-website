@@ -1,0 +1,88 @@
+services:
+  wordpress:
+    image: wordpress:php8.2-apache
+    container_name: brideenvy-wp
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DEBUG: "1"
+      LOCAL_DEV: "1"
+      WORDPRESS_CONFIG_EXTRA: |
+        define('WP_DEBUG_LOG', true);
+        define('WP_DEBUG_DISPLAY', true);
+        define('SCRIPT_DEBUG', true);
+        define('DISABLE_WP_CRON', true);
+    volumes:
+      - wordpress_core:/var/www/html
+      - ./wp-content:/var/www/html/wp-content
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: mysql:8.0
+    container_name: brideenvy-db
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+      MYSQL_ROOT_PASSWORD: rootpassword
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: brideenvy-pma
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: db
+      PMA_USER: root
+      PMA_PASSWORD: rootpassword
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: brideenvy-mail
+    restart: unless-stopped
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
+  wpcli:
+    image: wordpress:cli-php8.2
+    container_name: brideenvy-cli
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+    volumes:
+      - wordpress_core:/var/www/html
+      - ./wp-content:/var/www/html/wp-content
+      - ./db:/db
+    depends_on:
+      db:
+        condition: service_healthy
+    user: "33:33"
+    entrypoint: ["wp", "--allow-root"]
+    command: ["--info"]
+    profiles:
+      - cli
+
+volumes:
+  wordpress_core:
+  db_data:

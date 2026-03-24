@@ -1,0 +1,41 @@
+# Dependencies
+/vendor/
+/node_modules/
+
+# Database dumps (local dev only)
+/db/*.sql
+/db/*.sql.gz
+
+# WordPress uploads (managed on server, not in repo)
+/wp-content/uploads/
+
+# Third-party plugins (installed via wp-cli, see plugins.txt)
+/wp-content/plugins/woocommerce/
+/wp-content/plugins/woocommerce-*/
+/wp-content/plugins/advanced-custom-fields*/
+/wp-content/plugins/wordpress-seo/
+
+# Cache and generated files
+/wp-content/cache/
+/wp-content/upgrade/
+/wp-content/wflogs/
+*.log
+
+# Dev tool caches
+.phpunit.result.cache
+.phpcs.cache
+
+# OS files
+desktop.ini
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Docker volumes
+/docker/data/
+
+# Claude Code internal config
+/.claude/

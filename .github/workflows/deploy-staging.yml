@@ -1,0 +1,60 @@
+name: Deploy to Staging
+
+on:
+  push:
+    branches: [staging]
+  workflow_dispatch:
+
+jobs:
+  lint:
+    name: Lint (WPCS)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: composer
+
+      - name: Install dependencies
+        run: composer install --no-progress --no-interaction
+
+      - name: Run PHPCS
+        run: composer lint
+
+  test:
+    name: Tests (PHPUnit)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: composer
+
+      - name: Install dependencies
+        run: composer install --no-progress --no-interaction
+
+      - name: Run PHPUnit
+        run: composer test
+
+  deploy:
+    name: Deploy to Staging
+    needs: [lint, test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.CLOUDWAYS_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          echo -e "Host *\n  StrictHostKeyChecking no\n  IdentityFile ~/.ssh/deploy_key" > ~/.ssh/config
+
+      - name: Deploy via rsync
+        run: bash .github/scripts/deploy.sh "${{ secrets.CLOUDWAYS_USER }}@${{ secrets.CLOUDWAYS_HOST }}" "${{ secrets.STAGING_REMOTE_PATH }}"

@@ -1,0 +1,4 @@
+# Third-party plugins - installed via wp-cli (make plugins-install)
+# One plugin slug per line. Lines starting with # are comments.
+woocommerce
+wordpress-seo
